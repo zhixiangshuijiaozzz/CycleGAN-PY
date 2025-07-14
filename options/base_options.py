@@ -20,14 +20,14 @@ class BaseOptions:
         parser.add_argument('--verbose', action='store_true', help='打印更多信息')
 
         # ---- 数据 & 训练超参（允许命令行覆盖，若不传则用默认）----
-        parser.add_argument('--load_size', type=int, default=286,
+        parser.add_argument('--load_size', type=int, default=256,
                             help='Resize 的长边')
         parser.add_argument('--crop_size', type=int, default=256,
                             help='随机裁剪尺寸')
         parser.add_argument('--batch_size', type=int, default=1, help='批量大小')
-        parser.add_argument('--n_epochs', type=int, default=100,
+        parser.add_argument('--n_epochs', type=int, default=50,
                             help='学习率恒定阶段 epoch 数')
-        parser.add_argument('--n_epochs_decay', type=int, default=100,
+        parser.add_argument('--n_epochs_decay', type=int, default=50,
                             help='学习率线性衰减阶段 epoch 数')
 
         self.initialized = True
