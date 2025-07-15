@@ -1,6 +1,7 @@
 import os
 import time
 import warnings
+
 from datetime import datetime
 import itertools
 
@@ -8,7 +9,6 @@ import torch
 from torch.utils.data import DataLoader
 from torch.utils.tensorboard import SummaryWriter
 from tqdm import tqdm                      # 进度条
-
 
 from data.unpaired_dataset import UnpairedImageDataset
 from models.generators import ResnetGenerator
@@ -22,15 +22,14 @@ if __name__ == '__main__':
     # 1) 解析参数（自动检测 MPS / CUDA / CPU）
     opt = BaseOptions().parse()
 
-    # 2) 为本次训练创建唯一 session 目录
-    timestamp   = datetime.now().strftime('%Y%m%d-%H%M%S')
-    session_dir = os.path.join(opt.checkpoints_dir, opt.name, timestamp)
+    # 2) 统一 session 目录，不再使用时间戳
+    session_dir = os.path.join(opt.checkpoints_dir, opt.name)
     os.makedirs(session_dir, exist_ok=True)
 
-    # 3) TensorBoard
+    # 3) TensorBoard（直接写入 tb_logs 子目录）
     writer = SummaryWriter(log_dir=os.path.join(session_dir, 'tb_logs'))
 
-    # 4) 普通日志
+    # 4) 普通日志（写入 session_dir/loss_log.txt）
     logger = Logger(opt, session_dir=session_dir)
 
     # 5) 数据加载
@@ -88,7 +87,6 @@ if __name__ == '__main__':
     for epoch in range(1, total_epochs + 1):
         epoch_start = time.time()
 
-        # tqdm 包装 DataLoader
         progress = tqdm(loader,
                         desc=f'Epoch {epoch}/{total_epochs}',
                         ncols=85)
@@ -162,11 +160,16 @@ if __name__ == '__main__':
         epoch_time = time.time() - epoch_start
         logger.log(f'>>> End epoch {epoch} | Time: {epoch_time:.1f}s')
 
-        # 每 5 个 epoch 保存一次
+        # 每 5 个 epoch 保存一次带 epoch 的模型
         if epoch % 5 == 0:
             torch.save(netG_A2B.state_dict(), os.path.join(session_dir, f'G_A2B_ep{epoch}.pth'))
             torch.save(netG_B2A.state_dict(), os.path.join(session_dir, f'G_B2A_ep{epoch}.pth'))
             torch.save(netD_A.state_dict(),   os.path.join(session_dir, f'D_A_ep{epoch}.pth'))
             torch.save(netD_B.state_dict(),   os.path.join(session_dir, f'D_B_ep{epoch}.pth'))
+
+        # 每个 epoch 也保存最新模型（覆盖）
+        torch.save(netG_A2B.state_dict(), os.path.join(session_dir, 'latest_net_G.pth'))
+        torch.save(netD_A.state_dict(),   os.path.join(session_dir, 'latest_net_D_A.pth'))
+        torch.save(netD_B.state_dict(),   os.path.join(session_dir, 'latest_net_D_B.pth'))
 
     writer.close()
