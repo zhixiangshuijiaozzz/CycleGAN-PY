@@ -24,7 +24,7 @@ class BaseOptions:
                             help='Resize 的长边')
         parser.add_argument('--crop_size', type=int, default=256,
                             help='随机裁剪尺寸')
-        parser.add_argument('--batch_size', type=int, default=1, help='批量大小')
+        parser.add_argument('--batch_size', type=int, default=10, help='批量大小')
         parser.add_argument('--n_epochs', type=int, default=50,
                             help='学习率恒定阶段 epoch 数')
         parser.add_argument('--n_epochs_decay', type=int, default=50,
