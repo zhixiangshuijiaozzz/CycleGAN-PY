@@ -2,7 +2,6 @@ import random
 import torch
 
 class ImagePool:
-    """历史生成假图像池，缓解判别器过拟合"""
     def __init__(self, pool_size):
         self.pool_size = pool_size
         if pool_size > 0:

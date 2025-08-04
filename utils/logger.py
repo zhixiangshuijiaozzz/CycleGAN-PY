@@ -3,10 +3,6 @@ from datetime import datetime
 
 class Logger:
     def __init__(self, opt, session_dir: str = None):
-        """
-        如果传入 session_dir，则所有日志都写到 session_dir；
-        否则写到 checkpoints/opt.name。
-        """
         if session_dir:
             self.log_dir = session_dir
         else:

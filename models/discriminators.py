@@ -3,7 +3,6 @@ import torch.nn as nn
 from .weights_init import init_weights
 
 class NLayerDiscriminator(nn.Module):
-    """PatchGAN 判别器，默认 4 层"""
     def __init__(self, input_nc, ndf=64, n_layers=3):
         super().__init__()
         kw = 4
@@ -23,7 +22,6 @@ class NLayerDiscriminator(nn.Module):
                 nn.InstanceNorm2d(ndf * nf_mult),
                 nn.LeakyReLU(0.2, True)
             ]
-        # 最后一层 stride=1
         nf_mult_prev = nf_mult
         nf_mult = min(2**n_layers, 8)
         sequence += [
@@ -32,7 +30,6 @@ class NLayerDiscriminator(nn.Module):
             nn.InstanceNorm2d(ndf * nf_mult),
             nn.LeakyReLU(0.2, True)
         ]
-        # 输出一张 Patch 判别图
         sequence += [nn.Conv2d(ndf * nf_mult, 1, kernel_size=kw, stride=1, padding=padw)]
         self.model = nn.Sequential(*sequence)
         init_weights(self)
