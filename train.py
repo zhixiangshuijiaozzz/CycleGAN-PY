@@ -24,7 +24,15 @@ from options.base_options import BaseOptions
 
 # ---------------- 感知损失设置 ----------------
 # 1. 加载预训练 VGG16（只取前 16 层特征）
-vgg = vgg16(pretrained=True).features[:16].eval()
+# 构建模型但不加载预训练权重
+model = vgg16(weights=None)
+
+# 加载本地 .pth 权重文件
+state_dict = torch.load("/root/.cache/torch/hub/checkpoints/vgg16-397923af.pth")
+model.load_state_dict(state_dict)
+
+# 截取前16层并设置为 eval 模式
+vgg = model.features[:16].eval()
 for p in vgg.parameters():
     p.requires_grad = False
 
